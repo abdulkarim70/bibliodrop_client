@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
      <body className="h-screen flex flex-col">
   <Navbar />
 
-  <main className="flex-1 overflow-y-auto">
+  <main className="">
     {children}
   </main>
 
