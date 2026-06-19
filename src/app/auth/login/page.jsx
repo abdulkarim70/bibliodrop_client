@@ -10,7 +10,8 @@ import { Eye, EyeSlash, Envelope, Lock } from "@gravity-ui/icons";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
 
-// import { signIn } from "@/lib/auth-client"; 
+ import { signIn } from "@/lib/auth-client"; 
+import toast, { Toaster } from "react-hot-toast";
 
 const Login = () => {
   const router = useRouter();
@@ -33,15 +34,15 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // --- Better Auth Login Logic ---
-      /*
+      
+      
       const { data: authData, error: authError } = await signIn.email({
         email: data.email,
         password: data.password,
       });
 
       if (authError) throw new Error(authError.message || "Invalid email or password");
-      */
+      toast.success("Login successful! Redirecting...");
 
       //redirect
       setTimeout(() => {
@@ -57,12 +58,12 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      /*
+      
       await signIn.social({
         provider: "google",
         callbackURL: "/"
       });
-      */
+      
       console.log("Redirecting to Google Auth...");
     } catch (err) {
       console.error(err);
@@ -72,7 +73,7 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 py-10 font-sans">
       <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-        
+            <Toaster position="top-right" reverseOrder={false} />
 
         <div className="text-center mb-8">
           <Image
