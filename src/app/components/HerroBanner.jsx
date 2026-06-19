@@ -8,10 +8,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 const slides = [
   {
     id: 1,
-    title: "Discover Your Next Great Read",
+    title: "Your Local Library, Delivered",
     description: "Explore thousands of books, audiobooks, and magazines in our endless digital library.",
     image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop",
-    buttonText: "Browse Collection",
+    buttonText: "Browse Books",
     buttonLink: "/browse"
   },
   {

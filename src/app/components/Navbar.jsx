@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-// গ্রাভিটি আইকন
+
 import { Moon } from '@gravity-ui/icons'; 
 import Image from 'next/image';
 
@@ -13,7 +13,7 @@ const Navbar = () => {
     <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         
-        {/* --- লোগো --- */}
+       
         <Link href="/">
           <Image
             src="/Logo_F.png"
@@ -52,10 +52,10 @@ const Navbar = () => {
           
          
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/login" className="px-6 py-2.5 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-2xl hover:border-[#6a46cd] transition-all text-sm">
+            <Link href="/auth/login" className="px-6 py-2.5 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-2xl hover:border-[#6a46cd] transition-all text-sm">
               Login
             </Link>
-            <Link href="/register" className="px-6 py-2.5 bg-[#6a46cd] text-white font-bold rounded-2xl hover:bg-[#5839b3] shadow-md shadow-purple-100 transition-all text-sm">
+            <Link href="/auth/register" className="px-6 py-2.5 bg-[#6a46cd] text-white font-bold rounded-2xl hover:bg-[#5839b3] shadow-md shadow-purple-100 transition-all text-sm">
               Register
             </Link>
           </div>
@@ -104,7 +104,7 @@ const Navbar = () => {
             <Link href="/login" className="w-full text-center px-6 py-3 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-xl hover:border-[#6a46cd] transition-all text-sm">
               Login
             </Link>
-            <Link href="/register" className="w-full text-center px-6 py-3 bg-[#6a46cd] text-white font-bold rounded-xl hover:bg-[#5839b3] shadow-md transition-all text-sm">
+            <Link href="/auth/register" className="w-full text-center px-6 py-3 bg-[#6a46cd] text-white font-bold rounded-xl hover:bg-[#5839b3] shadow-md transition-all text-sm">
               Register
             </Link>
           </div>
