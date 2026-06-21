@@ -1,9 +1,9 @@
-import React from 'react';
+
 
 const UserPage = () => {
     return (
         <div>
-            Welcome to user page
+        <h1>Welcome to  Dashboard</h1>
         </div>
     );
 };
