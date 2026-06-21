@@ -1,33 +1,43 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Moon } from '@gravity-ui/icons'; 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, Spinner } from "@heroui/react";
+import { Moon,  } from '@gravity-ui/icons'; 
+import { Avatar, Spinner } from "@heroui/react"; 
 import { useRouter } from 'next/navigation';
 
-// আপনার প্রজেক্টে Better Auth Client যেখানে কনফিগার করা আছে, সেখানকার সঠিক পাথ দিন
-// উদাহরণস্বরূপ: import { authClient } from "@/lib/auth-client";
 import { authClient } from "@/lib/auth-client"; 
+
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); 
+  const dropdownRef = useRef(null); 
+
   const router = useRouter();
-  
-  // Better Auth থেকে সেশন এবং লোডিং স্টেট নেওয়া হচ্ছে
   const { data: session, isPending } = authClient.useSession();
 
-  // লগআউট হ্যান্ডলার
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push('/'); // লগআউটের পর হোমপেজে পাঠিয়ে দেবে
+          router.push('/');
         },
       },
     });
   };
+
+  // স্ক্রিনের বাইরে ক্লিক করলে ড্রপডাউন বন্ধ করার লজিক
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -44,7 +54,7 @@ const Navbar = () => {
           />
         </Link>
 
-        {/* Desktop Links */}
+        {/* Desktop Links (সবগুলো লিংক এখানে আছে) */}
         <div className="hidden md:flex items-center gap-2 font-medium text-[15px]">
           <Link href="/" className="px-5 py-2 bg-[#f3f0ff] text-[#6a46cd] rounded-2xl transition-all">
             Home
@@ -76,46 +86,68 @@ const Navbar = () => {
             {isPending ? (
               <Spinner size="sm" color="secondary" />
             ) : session ? (
-              <Dropdown placement="bottom-end">
-                <DropdownTrigger>
+              
+              // কাস্টম ড্রপডাউন
+              <div className="relative" ref={dropdownRef}>
+                <button 
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                 className="flex items-center focus:outline-none"
+                >
                   <Avatar
                     isBordered
-                    as="button"
                     className="transition-transform cursor-pointer"
                     color="secondary"
                     name={session.user?.name || "User"}
                     size="sm"
                     src={session.user?.image || ""}
                   />
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2 cursor-default">
-                    <p className="font-semibold text-gray-500 text-xs">Signed in as</p>
-                    <p className="font-bold text-[#6a46cd]">{session.user?.name || session.user?.email}</p>
-                    {/* ইউজারের রোল দেখানো হচ্ছে */}
-                    {session.user?.role && (
-                      <p className="text-[10px] uppercase bg-purple-100 text-purple-700 w-max px-2 py-0.5 rounded-full mt-1">
-                        {session.user.role}
-                      </p>
-                    )}
-                  </DropdownItem>
-                  
-                  <DropdownItem key="dashboard" as={Link} href="/dashboard">
-                    Dashboard
-                  </DropdownItem>
+                </button>
 
-                  {/* রোল যদি 'admin' হয়, তবেই এই মেনুটি দেখাবে */}
-                  {session.user?.role === "admin" && (
-                    <DropdownItem key="admin-panel" as={Link} href="/admin" color="secondary">
-                      Admin Panel
-                    </DropdownItem>
-                  )}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50">
+                    <div className="px-4 py-3 border-b border-gray-50 cursor-default">
+                      <p className="font-semibold text-gray-500 text-xs">Signed in as</p>
+                      <p className="font-bold text-[#6a46cd] truncate">{session.user?.name || session.user?.email}</p>
+                      {session.user?.role && (
+                        <p className="text-[10px] uppercase bg-purple-100 text-purple-700 w-max px-2 py-0.5 rounded-full mt-1">
+                          {session.user.role}
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div className="p-2">
+                      <Link 
+                        href="/dashboard" 
+                        onClick={() => setIsProfileOpen(false)} 
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        Dashboard
+                      </Link>
 
-                  <DropdownItem key="logout" color="danger" onClick={handleLogout}>
-                    Log Out
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+                      {session.user?.role === "admin" && (
+                        <Link 
+                          href="/admin" 
+                          onClick={() => setIsProfileOpen(false)}
+                          className="block px-4 py-2 text-sm text-[#6a46cd] hover:bg-purple-50 rounded-lg transition-colors"
+                        >
+                          Admin Panel
+                        </Link>
+                      )}
+
+                      <button 
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors mt-1"
+                      >
+                        Log Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
             ) : (
               <>
                 <Link href="/auth/login" className="px-6 py-2.5 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-2xl hover:border-[#6a46cd] transition-all text-sm">
@@ -190,7 +222,6 @@ const Navbar = () => {
                   Dashboard
                 </Link>
 
-                {/* মোবাইল মেনুতে অ্যাডমিন প্যানেল লিঙ্ক */}
                 {session.user?.role === "admin" && (
                   <Link href="/admin" className="block px-5 py-3 text-[#6a46cd] font-medium rounded-xl transition-all hover:bg-purple-50">
                     Admin Panel
