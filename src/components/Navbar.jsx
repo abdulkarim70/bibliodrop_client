@@ -2,18 +2,38 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-
-import { Moon } from '@gravity-ui/icons'; 
 import Image from 'next/image';
+import { Moon } from '@gravity-ui/icons'; 
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, Spinner } from "@heroui/react";
+import { useRouter } from 'next/navigation';
+
+// আপনার প্রজেক্টে Better Auth Client যেখানে কনফিগার করা আছে, সেখানকার সঠিক পাথ দিন
+// উদাহরণস্বরূপ: import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client"; 
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
+  
+  // Better Auth থেকে সেশন এবং লোডিং স্টেট নেওয়া হচ্ছে
+  const { data: session, isPending } = authClient.useSession();
+
+  // লগআউট হ্যান্ডলার
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/'); // লগআউটের পর হোমপেজে পাঠিয়ে দেবে
+        },
+      },
+    });
+  };
 
   return (
     <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         
-       
+        {/* Logo */}
         <Link href="/">
           <Image
             src="/Logo_F.png"
@@ -24,7 +44,7 @@ const Navbar = () => {
           />
         </Link>
 
-       
+        {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-2 font-medium text-[15px]">
           <Link href="/" className="px-5 py-2 bg-[#f3f0ff] text-[#6a46cd] rounded-2xl transition-all">
             Home
@@ -43,35 +63,81 @@ const Navbar = () => {
           </Link>
         </div>
 
-    
+        {/* Right Side Actions */}
         <div className="flex items-center gap-3">
-         
+          
+          {/* Dark Mode Toggle */}
           <button className="p-2.5 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 transition-all">
             <Moon className="w-5 h-5" />
           </button>
           
-         
+          {/* Desktop Auth / User Dropdown */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/auth/login" className="px-6 py-2.5 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-2xl hover:border-[#6a46cd] transition-all text-sm">
-              Login
-            </Link>
-            <Link href="/auth/register" className="px-6 py-2.5 bg-[#6a46cd] text-white font-bold rounded-2xl hover:bg-[#5839b3] shadow-md shadow-purple-100 transition-all text-sm">
-              Register
-            </Link>
+            {isPending ? (
+              <Spinner size="sm" color="secondary" />
+            ) : session ? (
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Avatar
+                    isBordered
+                    as="button"
+                    className="transition-transform cursor-pointer"
+                    color="secondary"
+                    name={session.user?.name || "User"}
+                    size="sm"
+                    src={session.user?.image || ""}
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" className="h-14 gap-2 cursor-default">
+                    <p className="font-semibold text-gray-500 text-xs">Signed in as</p>
+                    <p className="font-bold text-[#6a46cd]">{session.user?.name || session.user?.email}</p>
+                    {/* ইউজারের রোল দেখানো হচ্ছে */}
+                    {session.user?.role && (
+                      <p className="text-[10px] uppercase bg-purple-100 text-purple-700 w-max px-2 py-0.5 rounded-full mt-1">
+                        {session.user.role}
+                      </p>
+                    )}
+                  </DropdownItem>
+                  
+                  <DropdownItem key="dashboard" as={Link} href="/dashboard">
+                    Dashboard
+                  </DropdownItem>
+
+                  {/* রোল যদি 'admin' হয়, তবেই এই মেনুটি দেখাবে */}
+                  {session.user?.role === "admin" && (
+                    <DropdownItem key="admin-panel" as={Link} href="/admin" color="secondary">
+                      Admin Panel
+                    </DropdownItem>
+                  )}
+
+                  <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            ) : (
+              <>
+                <Link href="/auth/login" className="px-6 py-2.5 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-2xl hover:border-[#6a46cd] transition-all text-sm">
+                  Login
+                </Link>
+                <Link href="/auth/register" className="px-6 py-2.5 bg-[#6a46cd] text-white font-bold rounded-2xl hover:bg-[#5839b3] shadow-md shadow-purple-100 transition-all text-sm">
+                  Register
+                </Link>
+              </>
+            )}
           </div>
 
-          
+          {/* Mobile Menu Toggle */}
           <button 
             className="md:hidden p-2.5 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 transition-all"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
-             
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-             
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12h18M3 6h18M3 18h18" />
               </svg>
@@ -80,7 +146,7 @@ const Navbar = () => {
         </div>
       </div>
 
-     
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-2 shadow-lg absolute w-full">
           <Link href="/" className="block px-5 py-3 bg-[#f3f0ff] text-[#6a46cd] font-medium rounded-xl transition-all">
@@ -99,14 +165,55 @@ const Navbar = () => {
             Contact
           </Link>
 
-          {/*Mobile Menu*/}
+          {/* Mobile Auth Menu */}
           <div className="flex flex-col gap-3 pt-4 mt-2 border-t border-gray-100">
-            <Link href="/login" className="w-full text-center px-6 py-3 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-xl hover:border-[#6a46cd] transition-all text-sm">
-              Login
-            </Link>
-            <Link href="/auth/register" className="w-full text-center px-6 py-3 bg-[#6a46cd] text-white font-bold rounded-xl hover:bg-[#5839b3] shadow-md transition-all text-sm">
-              Register
-            </Link>
+            {isPending ? (
+              <div className="flex justify-center p-4"><Spinner size="sm" color="secondary" /></div>
+            ) : session ? (
+              <>
+                <div className="px-5 py-3 flex items-center gap-3">
+                  <Avatar src={session.user?.image || ""} size="sm" isBordered color="secondary" name={session.user?.name || "User"} />
+                  <div className="overflow-hidden">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold truncate">{session.user?.name || "User"}</p>
+                      {session.user?.role && (
+                        <span className="text-[9px] uppercase bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-md">
+                          {session.user.role}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
+                  </div>
+                </div>
+                
+                <Link href="/dashboard" className="block px-5 py-3 text-gray-600 font-medium rounded-xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
+                  Dashboard
+                </Link>
+
+                {/* মোবাইল মেনুতে অ্যাডমিন প্যানেল লিঙ্ক */}
+                {session.user?.role === "admin" && (
+                  <Link href="/admin" className="block px-5 py-3 text-[#6a46cd] font-medium rounded-xl transition-all hover:bg-purple-50">
+                    Admin Panel
+                  </Link>
+                )}
+
+                <button 
+                  onClick={handleLogout}
+                  className="w-full text-left px-5 py-3 text-red-500 font-medium rounded-xl transition-all hover:bg-red-50"
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="w-full text-center px-6 py-3 border-2 border-gray-200 text-[#6a46cd] font-bold rounded-xl hover:border-[#6a46cd] transition-all text-sm">
+                  Login
+                </Link>
+                <Link href="/auth/register" className="w-full text-center px-6 py-3 bg-[#6a46cd] text-white font-bold rounded-xl hover:bg-[#5839b3] shadow-md transition-all text-sm">
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -20,4 +20,14 @@ export const auth = betterAuth({
     // Optional: if you don't provide a client, database transactions won't be enabled.
     client
   }),
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "reader",
+        input: true, // এটি true করলেই ফ্রন্টএন্ড থেকে ডেটা রিসিভ করবে
+      }
+    }
+  }
 });
