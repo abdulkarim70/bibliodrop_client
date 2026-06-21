@@ -3,12 +3,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Moon,  } from '@gravity-ui/icons'; 
+import { Moon } from '@gravity-ui/icons'; 
 import { Avatar, Spinner } from "@heroui/react"; 
 import { useRouter } from 'next/navigation';
 
 import { authClient } from "@/lib/auth-client"; 
-
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,7 +27,14 @@ const Navbar = () => {
     });
   };
 
-  // স্ক্রিনের বাইরে ক্লিক করলে ড্রপডাউন বন্ধ করার লজিক
+  // রোল অনুযায়ী সঠিক ড্যাশবোর্ড লিংক জেনারেট করার ফাংশন
+  const getDashboardLink = () => {
+    const role = session?.user?.role;
+    if (role === "admin") return "/dashboard/admin";
+    if (role === "librarian") return "/dashboard/librarian";
+    return "/dashboard/user"; // ডিফল্ট বা নরমাল ইউজারদের জন্য
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -54,7 +60,7 @@ const Navbar = () => {
           />
         </Link>
 
-        {/* Desktop Links (সবগুলো লিংক এখানে আছে) */}
+        {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-2 font-medium text-[15px]">
           <Link href="/" className="px-5 py-2 bg-[#f3f0ff] text-[#6a46cd] rounded-2xl transition-all">
             Home
@@ -87,11 +93,10 @@ const Navbar = () => {
               <Spinner size="sm" color="secondary" />
             ) : session ? (
               
-              // কাস্টম ড্রপডাউন
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                 className="flex items-center focus:outline-none"
+                  className="flex items-center focus:outline-none"
                 >
                   <Avatar
                     isBordered
@@ -117,22 +122,12 @@ const Navbar = () => {
                     
                     <div className="p-2">
                       <Link 
-                        href="/dashboard" 
+                        href={getDashboardLink()} 
                         onClick={() => setIsProfileOpen(false)} 
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                       >
                         Dashboard
                       </Link>
-
-                      {session.user?.role === "admin" && (
-                        <Link 
-                          href="/admin" 
-                          onClick={() => setIsProfileOpen(false)}
-                          className="block px-4 py-2 text-sm text-[#6a46cd] hover:bg-purple-50 rounded-lg transition-colors"
-                        >
-                          Admin Panel
-                        </Link>
-                      )}
 
                       <button 
                         onClick={() => {
@@ -218,18 +213,19 @@ const Navbar = () => {
                   </div>
                 </div>
                 
-                <Link href="/dashboard" className="block px-5 py-3 text-gray-600 font-medium rounded-xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
+                <Link 
+                  href={getDashboardLink()} 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-5 py-3 text-gray-600 font-medium rounded-xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]"
+                >
                   Dashboard
                 </Link>
 
-                {session.user?.role === "admin" && (
-                  <Link href="/admin" className="block px-5 py-3 text-[#6a46cd] font-medium rounded-xl transition-all hover:bg-purple-50">
-                    Admin Panel
-                  </Link>
-                )}
-
                 <button 
-                  onClick={handleLogout}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
                   className="w-full text-left px-5 py-3 text-red-500 font-medium rounded-xl transition-all hover:bg-red-50"
                 >
                   Log Out
