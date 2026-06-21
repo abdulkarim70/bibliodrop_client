@@ -27,12 +27,12 @@ const Navbar = () => {
     });
   };
 
-  // রোল অনুযায়ী সঠিক ড্যাশবোর্ড লিংক জেনারেট করার ফাংশন
+
   const getDashboardLink = () => {
     const role = session?.user?.role;
     if (role === "admin") return "/dashboard/admin";
     if (role === "librarian") return "/dashboard/librarian";
-    return "/dashboard/user"; // ডিফল্ট বা নরমাল ইউজারদের জন্য
+    return "/dashboard/user"; 
   };
 
   useEffect(() => {

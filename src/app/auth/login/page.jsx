@@ -44,11 +44,22 @@ const Login = () => {
       if (authError) throw new Error(authError.message || "Invalid email or password");
       toast.success("Login successful! Redirecting...");
 
-      //redirect
-      setTimeout(() => {
-        setIsLoading(false);
-        router.push("/");
-      }, 2000);
+      const role = authData.user.role;
+
+setTimeout(() => {
+  setIsLoading(false);
+
+  if (role === "admin") {
+    router.push("/dashboard/admin");
+  } 
+  else if (role === "librarian") {
+    router.push("/dashboard/librarian");
+  } 
+  else {
+    router.push("/");
+  }
+
+}, 2000);
 
     } catch (err) {
       setServerError(err.message || "Invalid credentials. Please try again.");

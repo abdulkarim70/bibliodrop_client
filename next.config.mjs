@@ -2,9 +2,18 @@
 const nextConfig = {
   /* config options here */
   reactCompiler: true,
-   images: {
-    domains: ["images.unsplash.com","cdn.pixabay.com"],
-    
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
+      },
+    ],
   },
 };
 
