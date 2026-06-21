@@ -19,6 +19,7 @@ const Register = () => {
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+const [role, setRole]=useState('reader');
 
   const [passwordValue, setPasswordValue] = useState("");
 
@@ -236,7 +237,7 @@ const Register = () => {
           </TextField>
 
           <div className="pt-2 w-full">
-            <RadioGroup defaultValue="reader" name="role" color="secondary" className="gap-4">
+            <RadioGroup defaultValue="reader" name="role" color="secondary" className="gap-4" onChange={value=> setRole(value)}>
               <Label className="font-semibold text-gray-800 text-sm">Account Type</Label>
               <Description className="text-xs text-gray-500 -mt-2">Choose the role that best fits your needs.</Description>
               
