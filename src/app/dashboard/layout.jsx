@@ -25,7 +25,7 @@ export default function RoleBasedLayout({ children }) {
       return;
     }
 
-    // ROLE BASED PROTECTION (clean version)
+    
     if (pathname.startsWith("/dashboard/admin") && role !== "admin") {
       router.replace("/dashboard/user");
     }
