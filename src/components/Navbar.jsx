@@ -179,7 +179,7 @@ const Navbar = () => {
           <Link href="/" className="block px-5 py-3 bg-[#f3f0ff] text-[#6a46cd] font-medium rounded-xl transition-all">
             Home
           </Link>
-          <Link href="/browse" className="block px-5 py-3 text-gray-600 font-medium rounded-xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
+          <Link href="/books" className="block px-5 py-3 text-gray-600 font-medium rounded-xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
             Browse Books
           </Link>
           <Link href="/how-it-works" className="block px-5 py-3 text-gray-600 font-medium rounded-xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
