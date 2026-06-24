@@ -1,5 +1,5 @@
 "use client";
-
+import { useSession } from "@/lib/auth-client";
 import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -9,7 +9,7 @@ export default function AddBookPage() {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-
+const { data: session } = useSession();
   // ফর্মের ডেটা স্টোর করার স্টেট
   const [formData, setFormData] = useState({
     title: "",
@@ -69,12 +69,14 @@ export default function AddBookPage() {
       const imageUrl = imgbbData.data.display_url;
 
       // ২. ব্যাকএন্ডে বইয়ের ডাটা পাঠানো (লাইব্রেরিয়ানের ইমেইল পরে Auth থেকে বসাবেন)
-      const bookData = {
-        ...formData,
-        deliveryFee: parseFloat(formData.deliveryFee),
-        image: imageUrl,
-        librarianEmail: "librarian@example.com", // TODO: Better Auth থেকে লগইন করা ইউজারের ইমেইল বসাবেন
-      };
+     const bookData = {
+  ...formData,
+  deliveryFee: parseFloat(formData.deliveryFee),
+  image: imageUrl,
+  librarianEmail: session?.user?.email,
+  librarianId: session?.user?.id,
+  librarianName: session?.user?.name,
+};
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books`, {
         method: "POST",
