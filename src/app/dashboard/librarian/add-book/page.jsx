@@ -4,12 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { FaCloudUploadAlt, FaBook, FaSpinner } from "react-icons/fa";
-
+import { useRouter } from "next/navigation";
 export default function AddBookPage() {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
 const { data: session } = useSession();
+const router = useRouter();
   // ফর্মের ডেটা স্টোর করার স্টেট
   const [formData, setFormData] = useState({
     title: "",
@@ -85,18 +86,34 @@ const { data: session } = useSession();
         },
         body: JSON.stringify(bookData),
       });
+const result = await res.json();
 
-      const result = await res.json();
+if (result.success) {
+  toast.success(
+    "Book added successfully! Pending admin approval.",
+    { id: toastId }
+  );
 
-      if (result.success) {
-        toast.success("Book added successfully! Pending admin approval.", { id: toastId });
-        // ফর্ম রিসেট করা
-        setFormData({ title: "", author: "", category: "", deliveryFee: "", description: "" });
-        setImageFile(null);
-        setImagePreview(null);
-      } else {
-        throw new Error(result.error);
-      }
+  setFormData({
+    title: "",
+    author: "",
+    category: "",
+    deliveryFee: "",
+    description: "",
+  });
+
+  setImageFile(null);
+  setImagePreview(null);
+  setLoading(false);
+
+  setTimeout(() => {
+    router.push("/dashboard/librarian/manage-inventory");
+  }, 1000);
+
+  return;
+}
+
+throw new Error(result.error || "Failed to add book");
     } catch (error) {
       console.error(error);
       toast.error("Failed to add book. Please try again.", { id: toastId });
