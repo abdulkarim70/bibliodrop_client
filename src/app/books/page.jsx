@@ -74,7 +74,7 @@ export default async function BrowseBooksPage({ searchParams }) {
                     ) : (
                       <Link 
                         href={`/books/${book._id}`}
-                        className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition"
+                        className="text-sm font-medium text-white bg-[#6a46cd] hover:bg-blue-700 px-3 py-1.5 rounded-lg transition"
                       >
                         Details
                       </Link>

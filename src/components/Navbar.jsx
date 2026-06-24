@@ -65,7 +65,7 @@ const Navbar = () => {
           <Link href="/" className="px-5 py-2 bg-[#f3f0ff] text-[#6a46cd] rounded-2xl transition-all">
             Home
           </Link>
-          <Link href="/browse" className="px-5 py-2 text-gray-500 rounded-2xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
+          <Link href="/books" className="px-5 py-2 text-gray-500 rounded-2xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
             Browse Books
           </Link>
           <Link href="/how-it-works" className="px-5 py-2 text-gray-500 rounded-2xl transition-all hover:bg-[#f3f0ff] hover:text-[#6a46cd]">
