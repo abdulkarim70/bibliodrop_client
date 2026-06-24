@@ -11,7 +11,7 @@ const UserSidebar = () => {
  const menuItems = [
   {
     name: "Overview",
-    path: "/dashboard/user",
+    path: "/dashboard/user/overview",
   },
   {
     name: "Delivery History",
