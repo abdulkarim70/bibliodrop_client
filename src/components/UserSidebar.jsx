@@ -23,7 +23,7 @@ const UserSidebar = () => {
   },
   {
     name: "My Reviews",
-    path: "/dashboard/user/reviews",
+    path: "/dashboard/user/my-reviews",
   },
 ];
 

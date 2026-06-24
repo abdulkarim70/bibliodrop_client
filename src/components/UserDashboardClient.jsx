@@ -18,6 +18,7 @@ export default function UserDashboardClient({ userEmail }) {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/deliveries/user/${userEmail}`);
         const result = await res.json();
+        console.log("Fetched user stats:", result);
 
         if (result.success) {
           const deliveries = result.data;
@@ -78,7 +79,7 @@ export default function UserDashboardClient({ userEmail }) {
   return (
     <div className="p-6 max-w-7xl mx-auto min-h-screen bg-[#fcfcfd]">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Here's your reading overview.</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Here is your reading overview.</h1>
         <p className="text-gray-500 mt-2">Track your reading habits and delivery status.</p>
       </div>
 
