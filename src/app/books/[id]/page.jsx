@@ -1,3 +1,5 @@
+import LibrarianActionButtons from "@/components/LibrarianActionButtons"; // আপনার ফাইলের লোকেশন অনুযায়ী পাথ ঠিক করে নেবেন
+
 import { getCurrentUser } from "@/lib/auth-server";
 import { 
   FaUser, 
@@ -15,9 +17,11 @@ import {
 } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image"; 
+import { data } from "framer-motion/client";
 
 
 async function getBookDetails(id) {
+  
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books/${id}`, {
       cache: "no-store", 
@@ -28,8 +32,13 @@ async function getBookDetails(id) {
     }
     
     const data = await res.json();
+  
     return data.data;
-  } catch (error) {
+  }
+  
+ 
+  
+  catch (error) {
     console.error("Error fetching book details:", error);
     return null;
   }
@@ -40,11 +49,11 @@ export default async function BookDetailsPage({ params }) {
   const id = resolvedParams.id;
 
   const book = await getBookDetails(id);
-
+console.log(book);
   const currentUser = await getCurrentUser();
-  console.log("Current User:", currentUser);
-  console.log("CURRENT USER EMAIL:", currentUser?.email);
-console.log("BOOK LIBRARIAN EMAIL:", book.librarianEmail);
+//   console.log("Current User:", currentUser);
+//   console.log("CURRENT USER EMAIL:", currentUser?.email);
+// console.log("BOOK LIBRARIAN EMAIL:", book.librarianEmail);
   if (!book) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -79,6 +88,7 @@ console.log("BOOK LIBRARIAN EMAIL:", book.librarianEmail);
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
                 priority 
+             unoptimized
               />
             </div>
           ) : (
@@ -133,17 +143,7 @@ console.log("BOOK LIBRARIAN EMAIL:", book.librarianEmail);
           {/* Dynamic Action Buttons */}
           {isOwner ? (
             // Librarian Controls (If logged in user is the owner)
-            <div className="flex flex-wrap sm:flex-nowrap gap-4 mt-auto">
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all">
-                <FaEdit /> Edit
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-yellow-700 font-bold bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 transition-all">
-                <FaEyeSlash /> Unpublish
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-red-700 font-bold bg-red-50 hover:bg-red-100 border border-red-200 transition-all">
-                <FaTrash /> Delete
-              </button>
-            </div>
+            <LibrarianActionButtons bookId={book._id} />
           ) : (
             // User Controls (If not owner)
             <div className="flex flex-col sm:flex-row gap-4 mt-auto">
@@ -163,7 +163,7 @@ console.log("BOOK LIBRARIAN EMAIL:", book.librarianEmail);
                   className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-xl text-white font-bold text-lg shadow-md transition-all ${
                     isCheckedOut 
                     ? "bg-gray-400 cursor-not-allowed" 
-                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-xl"
+                    : "bg-[#6a46cd] hover:bg-blue-500 hover:shadow-xl"
                   }`}
                 >
                   Request Delivery
