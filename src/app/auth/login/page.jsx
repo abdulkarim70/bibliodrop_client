@@ -88,6 +88,7 @@ const Login = () => {
             width={150} 
             height={225}
             className="w-[120px] md:w-[180px] h-auto mx-auto mb-4" 
+            priority
           />
           <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome Back</h2>
           <p className="text-sm text-gray-500">Please enter your details to sign in</p>
