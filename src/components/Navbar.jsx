@@ -27,7 +27,6 @@ const Navbar = () => {
     });
   };
 
-
   const getDashboardLink = () => {
     const role = session?.user?.role;
     if (role === "admin") return "/dashboard/admin";
@@ -99,14 +98,20 @@ const Navbar = () => {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center focus:outline-none"
                 >
+                  {/* Updated Desktop Avatar */}
                   <Avatar
-                    isBordered
-                    className="transition-transform cursor-pointer"
+                    className="transition-transform cursor-pointer ring-2 ring-purple-200 ring-offset-1"
                     color="secondary"
-                    name={session.user?.name || "User"}
                     size="sm"
-                    src={session.user?.image || ""}
-                  />
+                  >
+                    <Avatar.Image
+                      alt={session.user?.name || "User"}
+                      src={session.user?.image || ""}
+                    />
+                    <Avatar.Fallback>
+                      {(session.user?.name || "User").charAt(0).toUpperCase()}
+                    </Avatar.Fallback>
+                  </Avatar>
                 </button>
 
                 {isProfileOpen && (
@@ -200,7 +205,18 @@ const Navbar = () => {
             ) : session ? (
               <>
                 <div className="px-5 py-3 flex items-center gap-3">
-                  <Avatar src={session.user?.image || ""} size="sm" isBordered color="secondary" name={session.user?.name || "User"} />
+                  
+                  {/* Updated Mobile Avatar */}
+                  <Avatar color="secondary" size="sm" className="ring-2 ring-purple-200 ring-offset-1">
+                    <Avatar.Image
+                      alt={session.user?.name || "User"}
+                      src={session.user?.image || ""}
+                    />
+                    <Avatar.Fallback>
+                      {(session.user?.name || "User").charAt(0).toUpperCase()}
+                    </Avatar.Fallback>
+                  </Avatar>
+
                   <div className="overflow-hidden">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-semibold truncate">{session.user?.name || "User"}</p>
