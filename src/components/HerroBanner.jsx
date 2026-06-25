@@ -12,7 +12,7 @@ const slides = [
     description: "Explore thousands of books, audiobooks, and magazines in our endless digital library.",
     image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop",
     buttonText: "Browse Books",
-    buttonLink: "/browse"
+    buttonLink: "/books"
   },
   {
     id: 2,
@@ -28,7 +28,7 @@ const slides = [
     description: "Find your perfect spot and let the pages transport you to another dimension.",
     image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2000&auto=format&fit=crop",
     buttonText: "Join Community",
-    buttonLink: "/register"
+    buttonLink: "/auth/register"
   }
 ];
 
