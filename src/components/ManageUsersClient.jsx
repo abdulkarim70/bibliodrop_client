@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { FaSpinner, FaTrash, FaUserCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 
@@ -26,8 +27,12 @@ export default function ManageUsersClient({ currentUserEmail }) {
     fetchUsers();
   }, []);
 
-  // রোল আপডেট করার ফাংশন
+  // রোল আপডেট করার ফাংশন (অ্যালার্ট সহ)
   const handleRoleChange = async (userId, newRole) => {
+    // রোল পরিবর্তন করার আগে কনফার্মেশন অ্যালার্ট
+    const confirmChange = window.confirm(`Are you sure you want to change this user's role to "${newRole}"?`);
+    if (!confirmChange) return;
+
     setActionLoading(userId);
     const toastId = toast.loading("Updating role...");
 
@@ -59,7 +64,7 @@ export default function ManageUsersClient({ currentUserEmail }) {
       return;
     }
     
-    if (!confirm("Are you sure you want to delete this user?")) return;
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
 
     setActionLoading(userId);
     const toastId = toast.loading("Deleting user...");
@@ -117,8 +122,9 @@ export default function ManageUsersClient({ currentUserEmail }) {
                   day: "numeric",
                   year: "numeric",
                 });
-                // ডিফল্ট রোল User ধরা হয়েছে
-                const currentRole = user.role || "User"; 
+                
+                // ডাটাবেস স্যাম্পল অনুযায়ী ডিফল্ট রোল "reader" ধরা হয়েছে
+                const currentRole = user.role || "reader"; 
 
                 return (
                   <tr key={user._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
@@ -126,9 +132,17 @@ export default function ManageUsersClient({ currentUserEmail }) {
                     {/* User Info (Avatar + Name) */}
                     <td className="p-5 flex items-center gap-3">
                       {user.image ? (
-                        <img src={user.image} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+                        <div className="relative w-10 h-10 shrink-0">
+                          <Image 
+                            src={user.image} 
+                            alt={user.name || "User"} 
+                            fill
+                            className="rounded-full object-cover" 
+                            unoptimized
+                          />
+                        </div>
                       ) : (
-                        <FaUserCircle className="text-4xl text-gray-300" />
+                        <FaUserCircle className="text-4xl text-gray-300 shrink-0" />
                       )}
                       <span className="font-semibold text-gray-800 text-base">{user.name || "Unknown User"}</span>
                     </td>
@@ -146,9 +160,9 @@ export default function ManageUsersClient({ currentUserEmail }) {
                         disabled={actionLoading === user._id}
                         className="bg-white border border-gray-200 text-gray-700 rounded-lg px-3 py-1.5 outline-none focus:border-[#6a46cd] transition-colors cursor-pointer text-sm font-medium shadow-sm disabled:opacity-50"
                       >
-                        <option value="User">User</option>
-                        <option value="Librarian">Librarian</option>
-                        <option value="Admin">Admin</option>
+                        <option value="reader">Reader</option>
+                        <option value="librarian">Librarian</option>
+                        <option value="admin">Admin</option>
                       </select>
                     </td>
 
