@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Form, Input, Button } from "@heroui/react"; // TextField, Label, FieldError বাদ দেওয়া হয়েছে
+import { Form, Input, Button } from "@heroui/react"; 
 import { Eye, EyeSlash, Envelope, Lock } from "@gravity-ui/icons"; 
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
@@ -77,8 +77,11 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 py-10 font-sans">
-      <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+  
+    <div className="flex items-center justify-center min-h-[100dvh] bg-gray-50 px-4 py-6 font-sans">
+      
+    
+      <div className="w-full max-w-md p-6 sm:p-8 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
         <Toaster position="top-right" reverseOrder={false} />
 
         <div className="text-center mb-8">

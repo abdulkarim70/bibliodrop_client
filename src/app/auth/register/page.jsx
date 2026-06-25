@@ -3,10 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { 
-  Form, TextField, Label, Input, FieldError, Button, 
-  RadioGroup, Radio, Description 
-} from "@heroui/react";
+import { Form, Input, Button } from "@heroui/react"; 
 import { Eye, EyeSlash, Person, Envelope, Picture, Lock } from "@gravity-ui/icons"; 
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
@@ -19,8 +16,9 @@ const Register = () => {
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
-const [role, setRole]=useState('reader');
-
+  
+  // বাই-ডিফল্ট 'reader' সিলেক্ট করা থাকবে
+  const [role, setRole] = useState("reader");
   const [passwordValue, setPasswordValue] = useState("");
 
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -45,19 +43,16 @@ const [role, setRole]=useState('reader');
     setIsLoading(true);
 
     try {
-    
-      
       const { data: authData, error: authError } = await signUp.email({
         email: data.email,
         password: data.password,
         name: data.fullName,
         image: data.photoUrl || "",
-        role: data.role, 
+        role: role, // স্টেট থেকে সরাসরি রোল পাঠানো হচ্ছে
       });
 
       if (authError) throw new Error(authError.message);
       
-
       toast.success("Account created successfully! Redirecting...");
 
       setTimeout(() => {
@@ -74,7 +69,6 @@ const [role, setRole]=useState('reader');
 
   const handleGoogleLogin = async () => {
     try {
-      
       await signIn.social({
         provider: "google",
         callbackURL: "/"
@@ -88,11 +82,11 @@ const [role, setRole]=useState('reader');
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 py-10 font-sans">
+    <div className="flex items-center justify-center min-h-[100dvh] bg-gray-50 px-4 py-6 font-sans">
   
       <Toaster position="top-right" reverseOrder={false} />
       
-      <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+      <div className="w-full max-w-md p-6 sm:p-8 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
         
         <div className="text-center mb-8">
           <Image
@@ -108,12 +102,12 @@ const [role, setRole]=useState('reader');
         </div>
 
         <Button
-          className="w-full bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 shadow-sm mb-6"
+          className="w-full bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 shadow-sm mb-6 flex items-center justify-center gap-2"
           size="lg"
           radius="md"
           onPress={handleGoogleLogin}
         >
-          <FcGoogle className="w-5 h-5 mr-2" />
+          <FcGoogle className="w-5 h-5" />
           Continue with Google
         </Button>
 
@@ -123,145 +117,146 @@ const [role, setRole]=useState('reader');
           <div className="flex-1 h-px bg-gray-200"></div>
         </div>
 
-        <Form className="flex flex-col gap-4" onSubmit={onSubmit} validationBehavior="native">
+        <Form className="flex flex-col gap-5 w-full" onSubmit={onSubmit} validationBehavior="native">
           
-          <TextField name="fullName" isRequired>
-            <Label className="font-semibold text-gray-800 text-sm mb-1 block">Full Name</Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Person className="w-5 h-5 text-gray-400" />
-              </div>
-              <Input 
-                placeholder="Your Full Name" 
-                className="pl-10 h-10 w-full rounded-md border border-gray-200 focus-visible:outline-none focus-visible:border-[#6a46cd]"
-              />
-            </div>
-            <FieldError className="text-red-500 text-xs mt-1" />
-          </TextField>
+          {/* Full Name Field */}
+          <div className="w-full flex flex-col gap-1.5">
+            <label className="font-semibold text-gray-800 text-sm">Full Name</label>
+            <Input 
+              name="fullName" 
+              isRequired
+              placeholder="Your Full Name" 
+              variant="bordered" 
+              radius="md"
+              startContent={<Person className="w-5 h-5 text-gray-400 mr-1" />}
+              classNames={{ inputWrapper: "border-gray-200 shadow-none hover:border-[#6a46cd] focus-within:!border-[#6a46cd]" }}
+            />
+          </div>
 
-          <TextField 
-            name="email" 
-            type="email" 
-            isRequired
-            validate={(value) => {
-              if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                return "Please enter a valid email address";
+          {/* Email Field */}
+          <div className="w-full flex flex-col gap-1.5">
+            <label className="font-semibold text-gray-800 text-sm">Email Address</label>
+            <Input 
+              name="email" 
+              type="email" 
+              isRequired
+              validate={(value) => {
+                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+                  return "Please enter a valid email address";
+                }
+                return null;
+              }}
+              placeholder="you@example.com" 
+              variant="bordered" 
+              radius="md"
+              startContent={<Envelope className="w-5 h-5 text-gray-400 mr-1" />}
+              classNames={{ inputWrapper: "border-gray-200 shadow-none hover:border-[#6a46cd] focus-within:!border-[#6a46cd]" }}
+            />
+          </div>
+
+          {/* Photo URL Field */}
+          <div className="w-full flex flex-col gap-1.5">
+            <label className="font-semibold text-gray-800 text-sm">Photo URL (optional)</label>
+            <Input 
+              name="photoUrl" 
+              type="url"
+              placeholder="https://example.com/photo.jpg" 
+              variant="bordered" 
+              radius="md"
+              startContent={<Picture className="w-5 h-5 text-gray-400 mr-1" />}
+              classNames={{ inputWrapper: "border-gray-200 shadow-none hover:border-[#6a46cd] focus-within:!border-[#6a46cd]" }}
+            />
+          </div>
+
+          {/* Password Field */}
+          <div className="w-full flex flex-col gap-1.5">
+            <label className="font-semibold text-gray-800 text-sm">Password</label>
+            <Input 
+              name="password" 
+              isRequired 
+              type={isVisible ? "text" : "password"}
+              onValueChange={setPasswordValue}
+              validate={(value) => {
+                if (value.length < 6) return "Password must be at least 6 characters";
+                return null;
+              }}
+              placeholder="Min. 6 characters" 
+              variant="bordered" 
+              radius="md"
+              startContent={<Lock className="w-5 h-5 text-gray-400 mr-1" />}
+              endContent={
+                <button type="button" onClick={toggleVisibility} className="focus:outline-none" aria-label="Toggle visibility">
+                  {isVisible ? <EyeSlash className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
+                </button>
               }
-              return null;
-            }}
-          >
-            <Label className="font-semibold text-gray-800 text-sm mb-1 block">Email Address</Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Envelope className="w-5 h-5 text-gray-400" />
-              </div>
-              <Input 
-                placeholder="you@example.com" 
-                className="pl-10 h-10 w-full rounded-md border border-gray-200 focus-visible:outline-none focus-visible:border-[#6a46cd]"
-              />
-            </div>
-            <FieldError className="text-red-500 text-xs mt-1" />
-          </TextField>
+              classNames={{ inputWrapper: "border-gray-200 shadow-none hover:border-[#6a46cd] focus-within:!border-[#6a46cd]" }}
+            />
+          </div>
 
-          <TextField name="photoUrl" type="url">
-            <Label className="font-semibold text-gray-800 text-sm mb-1 block">Photo URL (optional)</Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Picture className="w-5 h-5 text-gray-400" />
-              </div>
-              <Input 
-                placeholder="https://example.com/photo.jpg" 
-                className="pl-10 h-10 w-full rounded-md border border-gray-200 focus-visible:outline-none focus-visible:border-[#6a46cd]"
-              />
-            </div>
-            <FieldError className="text-red-500 text-xs mt-1" />
-          </TextField>
+          {/* Confirm Password Field */}
+          <div className="w-full flex flex-col gap-1.5">
+            <label className="font-semibold text-gray-800 text-sm">Confirm Password</label>
+            <Input 
+              name="confirmPassword" 
+              isRequired 
+              type={isConfirmVisible ? "text" : "password"}
+              validate={(value) => {
+                if (value !== passwordValue) return "Passwords do not match";
+                return null;
+              }}
+              placeholder="Confirm your password" 
+              variant="bordered" 
+              radius="md"
+              startContent={<Lock className="w-5 h-5 text-gray-400 mr-1" />}
+              endContent={
+                <button type="button" onClick={toggleConfirmVisibility} className="focus:outline-none" aria-label="Toggle confirm visibility">
+                  {isConfirmVisible ? <EyeSlash className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
+                </button>
+              }
+              classNames={{ inputWrapper: "border-gray-200 shadow-none hover:border-[#6a46cd] focus-within:!border-[#6a46cd]" }}
+            />
+          </div>
 
-          <TextField 
-            name="password" 
-            isRequired 
-            minLength={6}
-            onChange={(value) => setPasswordValue(value)}
-            validate={(value) => {
-              if (value.length < 6) return "Password must be at least 6 characters";
-              return null;
-            }}
-          >
-            <Label className="font-semibold text-gray-800 text-sm mb-1 block">Password</Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="w-5 h-5 text-gray-400" />
-              </div>
-              <Input 
-                type={isVisible ? "text" : "password"}
-                placeholder="Min. 6 characters" 
-                className="pl-10 pr-10 h-10 w-full rounded-md border border-gray-200 focus-visible:outline-none focus-visible:border-[#6a46cd]"
-              />
-              <button 
-                type="button" 
-                onClick={toggleVisibility} 
-                className="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none"
-              >
-                {isVisible ? <EyeSlash className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
-              </button>
-            </div>
-            <FieldError className="text-red-500 text-xs mt-1" />
-          </TextField>
-
-          <TextField 
-            name="confirmPassword" 
-            isRequired 
-            validate={(value) => {
-              if (value !== passwordValue) return "Passwords do not match";
-              return null;
-            }}
-          >
-            <Label className="font-semibold text-gray-800 text-sm mb-1 block">Confirm Password</Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="w-5 h-5 text-gray-400" />
-              </div>
-              <Input 
-                type={isConfirmVisible ? "text" : "password"}
-                placeholder="Confirm your password" 
-                className="pl-10 pr-10 h-10 w-full rounded-md border border-gray-200 focus-visible:outline-none focus-visible:border-[#6a46cd]"
-              />
-              <button 
-                type="button" 
-                onClick={toggleConfirmVisibility} 
-                className="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none"
-              >
-                {isConfirmVisible ? <EyeSlash className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
-              </button>
-            </div>
-            <FieldError className="text-red-500 text-xs mt-1" />
-          </TextField>
-
-          <div className="pt-2 w-full">
-            <RadioGroup defaultValue="reader" name="role" color="secondary" className="gap-4" onChange={value=> setRole(value)}>
-              <Label className="font-semibold text-gray-800 text-sm">Account Type</Label>
-              <Description className="text-xs text-gray-500 -mt-2">Choose the role that best fits your needs.</Description>
+          {/* Role Selection (Custom Tailwind UI) */}
+          <div className="w-full mt-2">
+            <span className="font-semibold text-gray-800 text-sm block">Account Type</span>
+            <span className="text-xs text-gray-500 block mb-3 mt-0.5">Choose the role that best fits your needs.</span>
+            
+            <div className="flex flex-col gap-3">
               
-              <div className="flex flex-col gap-3 mt-1">
-                <Radio value="reader">
-                  <Radio.Content>
-                    <Radio.Control>
-                      <Radio.Indicator />
-                    </Radio.Control>
-                    <span className="font-medium text-gray-800">User (Reader)</span>
-                  </Radio.Content>
-                </Radio>
+              {/* Reader Option */}
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="reader" 
+                  checked={role === "reader"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="hidden"
+                />
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${role === "reader" ? "border-[#6a46cd]" : "border-gray-300 group-hover:border-gray-400"}`}>
+                  <div className={`w-2.5 h-2.5 rounded-full bg-[#6a46cd] transition-all duration-200 ${role === "reader" ? "scale-100 opacity-100" : "scale-0 opacity-0"}`} />
+                </div>
+                <span className="font-medium text-gray-800 text-sm transition-colors group-hover:text-black">User (Reader)</span>
+              </label>
 
-                <Radio value="librarian">
-                  <Radio.Content>
-                    <Radio.Control>
-                      <Radio.Indicator />
-                    </Radio.Control>
-                    <span className="font-medium text-gray-800">Librarian</span>
-                  </Radio.Content>
-                </Radio>
-              </div>
-            </RadioGroup>
+              {/* Librarian Option */}
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="librarian" 
+                  checked={role === "librarian"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="hidden"
+                />
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${role === "librarian" ? "border-[#6a46cd]" : "border-gray-300 group-hover:border-gray-400"}`}>
+                  <div className={`w-2.5 h-2.5 rounded-full bg-[#6a46cd] transition-all duration-200 ${role === "librarian" ? "scale-100 opacity-100" : "scale-0 opacity-0"}`} />
+                </div>
+                <span className="font-medium text-gray-800 text-sm transition-colors group-hover:text-black">Librarian</span>
+              </label>
+
+            </div>
           </div>
 
           {serverError && <p className="text-sm text-red-500 font-semibold text-center">{serverError}</p>}
@@ -269,7 +264,7 @@ const [role, setRole]=useState('reader');
           <Button
             type="submit"
             isLoading={isLoading}
-            className="w-full bg-[#6a46cd] hover:bg-[#312061] text-white font-medium text-md mt-4 shadow-md transition-colors"
+            className="w-full bg-[#6a46cd] hover:bg-[#5b3eb0] text-white font-medium text-md mt-2 shadow-md transition-colors"
             size="lg"
             radius="md"
           >
@@ -279,7 +274,7 @@ const [role, setRole]=useState('reader');
         
         <p className="text-center text-sm text-gray-500 mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-[#6a46cd] font-semibold hover:underline transition-all">
+          <Link href="/auth/login" className="text-[#6a46cd] font-semibold hover:underline transition-all">
             Log in
           </Link>
         </p>
