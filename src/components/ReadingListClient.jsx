@@ -1,12 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaSpinner, FaBookReader, FaCheckCircle, FaStar } from "react-icons/fa";
+import { FaSpinner, FaBookReader, FaCheckCircle, FaStar, FaTimes } from "react-icons/fa";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function ReadingListClient({ userEmail }) {
   const [readingList, setReadingList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // রিভিউ মডালের জন্য স্টেট
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  
+  // রিভিউ ফর্মের স্টেট
+  const [rating, setRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     const fetchReadingList = async () => {
@@ -15,11 +25,9 @@ export default function ReadingListClient({ userEmail }) {
         const data = await res.json();
         
         if (data.success) {
-          // শুধুমাত্র "Delivered" স্ট্যাটাসের ডেলিভারিগুলো ফিল্টার করা
           const deliveredBooks = data.data.filter(
             (delivery) => delivery.status === "Delivered"
           );
-          // নতুন ডেলিভারিগুলো যেন উপরে থাকে
           setReadingList(deliveredBooks.reverse()); 
         }
       } catch (error) {
@@ -33,6 +41,55 @@ export default function ReadingListClient({ userEmail }) {
       fetchReadingList();
     }
   }, [userEmail]);
+
+  // রিভিউ মডাল ওপেন করার ফাংশন
+  const openReviewModal = (book) => {
+    setSelectedBook(book);
+    setRating(5); // ডিফল্ট রেটিং
+    setReviewText("");
+    setIsReviewModalOpen(true);
+  };
+
+  // রিভিউ সাবমিট করার ফাংশন
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!reviewText.trim()) {
+      toast.error("Please write a review text");
+      return;
+    }
+
+    setSubmittingReview(true);
+    const toastId = toast.loading("Submitting your review...");
+
+    try {
+      const reviewData = {
+        bookId: selectedBook.bookId,
+        bookTitle: selectedBook.bookTitle,
+        userEmail: userEmail,
+        rating: rating,
+        reviewText: reviewText,
+      };
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reviewData),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        toast.success("Review submitted successfully!", { id: toastId });
+        setIsReviewModalOpen(false);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      toast.error("Failed to submit review", { id: toastId });
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -78,7 +135,6 @@ export default function ReadingListClient({ userEmail }) {
                 key={item._id} 
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col hover:shadow-md transition-shadow relative overflow-hidden"
               >
-                {/* Decorative top bar */}
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-[#6a46cd]"></div>
                 
                 <div className="flex-grow">
@@ -98,7 +154,6 @@ export default function ReadingListClient({ userEmail }) {
                   </p>
                 </div>
 
-                {/* Actions */}
                 <div className="border-t border-gray-100 pt-4 mt-auto flex gap-3">
                   <Link 
                     href={`/books/${item.bookId}`}
@@ -106,13 +161,91 @@ export default function ReadingListClient({ userEmail }) {
                   >
                     View Details
                   </Link>
-                  <button className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-xl text-sm font-bold border border-yellow-200 transition">
+                  <button 
+                    onClick={() => openReviewModal(item)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-xl text-sm font-bold border border-yellow-200 transition"
+                  >
                     <FaStar /> Write Review
                   </button>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {isReviewModalOpen && selectedBook && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
+            
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsReviewModalOpen(false)} 
+              className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors p-2"
+            >
+              <FaTimes size={20} />
+            </button>
+
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Write a Review</h2>
+              <p className="text-gray-500 mt-2 text-sm">
+                Share your thoughts on <span className="font-semibold text-gray-700">"{selectedBook.bookTitle}"</span>
+              </p>
+            </div>
+
+            <form onSubmit={handleReviewSubmit} className="space-y-6">
+              
+              {/* Star Rating Selection */}
+              <div className="flex flex-col items-center">
+                <label className="text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      type="button"
+                      key={star}
+                      onClick={() => setRating(star)}
+                      className={`text-3xl transition-colors ${
+                        star <= rating ? "text-yellow-400" : "text-gray-200 hover:text-yellow-200"
+                      }`}
+                    >
+                      <FaStar />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Review Text Area */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Your Experience</label>
+                <textarea
+                  required
+                  rows="4"
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  placeholder="What did you like or dislike about this book?"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
+                ></textarea>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={submittingReview}
+                className={`w-full py-3.5 rounded-xl text-white font-bold text-lg transition-all flex justify-center items-center gap-2 ${
+                  submittingReview ? "bg-purple-400 cursor-not-allowed" : "bg-[#6a46cd] hover:bg-purple-700 shadow-md"
+                }`}
+              >
+                {submittingReview ? (
+                  <>
+                    <FaSpinner className="animate-spin" /> Submitting...
+                  </>
+                ) : (
+                  "Submit Review"
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
